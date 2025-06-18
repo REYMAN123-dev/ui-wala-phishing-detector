@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Analysis Type - PhishGuard Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 75%, #533483 100%);
+        }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .dark-card {
+            background: #1a1a2e;
+            border: 1px solid #2d2d44;
+            color: #e2e8f0;
+        }
+        .accent-button {
+            background: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+            color: white;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .accent-button:hover {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 212, 170, 0.3);
+        }
+        .secondary-button {
+            background: transparent;
+            color: #00d4aa;
+            border: 2px solid #00d4aa;
+            transition: all 0.3s ease;
+        }
+        .secondary-button:hover {
+            background: #00d4aa;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .nav-dark {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #2d2d44;
+        }
+        .text-accent {
+            color: #00d4aa;
+        }
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 2rem;
+        }
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .shape {
+            position: absolute;
+            background: rgba(0, 212, 170, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        .shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+        .shape:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            top: 40%;
+            left: 80%;
+            animation-delay: 4s;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="nav-dark shadow-lg fixed w-full z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <i class="fas fa-shield-alt text-2xl text-accent mr-3"></i>
+                    <span class="text-xl font-bold text-white">PhishGuard Pro</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="/" class="text-gray-300 hover:text-accent transition-colors">Home</a>
+                    <a href="/choose-analysis" class="text-gray-300 hover:text-accent transition-colors">Choose Analysis</a>
+                    <a href="/url-analysis" class="text-gray-300 hover:text-accent transition-colors">URL Analysis</a>
+                    <a href="/email-analysis" class="text-gray-300 hover:text-accent transition-colors">Email Analysis</a>
+                </div>
+                <a href="/" class="secondary-button px-6 py-2 rounded-lg">
+                    Back to Home
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white relative overflow-hidden pt-32 pb-20">
+        <div class="floating-shapes">
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-4xl mx-auto">
+                <h1 class="text-5xl font-bold mb-6 leading-tight">
+                    Choose Your
+                    <span class="text-accent">Analysis Type</span>
+                </h1>
+                <p class="text-xl mb-8 opacity-90 leading-relaxed">
+                    Select the type of content you want to analyze for phishing threats. 
+                    Our AI-powered system will provide detailed security analysis.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analysis Options -->
+    <section class="py-20 bg-gray-800">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                <!-- URL Analysis Option -->
+                <div class="dark-card rounded-xl p-8 card-hover text-center">
+                    <div class="feature-icon">
+                        <i class="fas fa-link"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-4 text-white">URL Analysis</h3>
+                    <p class="text-gray-400 mb-6 leading-relaxed">
+                        Analyze suspicious links and URLs for phishing threats. Our AI examines domain reputation, 
+                        redirect patterns, SSL certificates, and other security indicators.
+                    </p>
+                    <div class="space-y-3 mb-8 text-left">
+                        <div class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-accent mr-3"></i>
+                            Domain reputation analysis
+                        </div>
+                        <div class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-accent mr-3"></i>
+                            SSL certificate verification
+                        </div>
+                        <div class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-accent mr-3"></i>
+                            Redirect chain analysis
+                        </div>
+                        <div class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-accent mr-3"></i>
+                            Typosquatting detection
+                        </div>
+                    </div>
+                    <a href="/url-analysis" class="accent-button px-8 py-4 rounded-lg font-semibold text-lg inline-block w-full">
+                        <i class="fas fa-rocket mr-2"></i>Start URL Analysis
+                    </a>
+                </div>
+
+                <!-- Email Analysis Option -->
+                <div class="dark-card rounded-xl p-8 card-hover text-center">
+                    <div class="feature-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-4 text-white">Email Analysis</h3>
+                    <p class="text-gray-400 mb-6 leading-relaxed">
+                        Analyze suspicious emails for phishing attempts. Our AI examines sender information, 
+                        content patterns, embedded links, and email authentication.
+                    </p>
+                    <div class="space-y-3 mb-8 text-left">
+                        <div class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-accent mr-3"></i>
+                            Sender verification
+                        </div>
+                        <div class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-accent mr-3"></i>
+                            Content pattern analysis
+                        </div>
+                        <div class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-accent mr-3"></i>
+                            Email header analysis
+                        </div>
+                        <div class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-accent mr-3"></i>
+                            SPF/DKIM verification
+                        </div>
+                    </div>
+                    <a href="/email-analysis" class="accent-button px-8 py-4 rounded-lg font-semibold text-lg inline-block w-full">
+                        <i class="fas fa-rocket mr-2"></i>Start Email Analysis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-4">Why Choose PhishGuard Pro?</h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                    Advanced AI technology with comprehensive security analysis
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="dark-card rounded-xl p-8 card-hover text-center">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4 text-white">AI-Powered</h3>
+                    <p class="text-gray-400">
+                        Advanced machine learning algorithms detect sophisticated phishing attempts with high accuracy.
+                    </p>
+                </div>
+                <div class="dark-card rounded-xl p-8 card-hover text-center">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4 text-white">Real-Time</h3>
+                    <p class="text-gray-400">
+                        Instant analysis with results delivered in under 2 seconds for immediate protection.
+                    </p>
+                </div>
+                <div class="dark-card rounded-xl p-8 card-hover text-center">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4 text-white">Secure</h3>
+                    <p class="text-gray-400">
+                        Enterprise-grade security with no data storage. Your privacy is our priority.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-950 text-white py-12">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex items-center justify-center mb-4">
+                <i class="fas fa-shield-alt text-2xl text-accent mr-3"></i>
+                <span class="text-xl font-bold">PhishGuard Pro</span>
+            </div>
+            <p class="text-gray-400 mb-4">
+                Advanced AI-powered phishing detection for a safer online experience
+            </p>
+            <div class="flex justify-center space-x-6 text-gray-400">
+                <a href="#" class="hover:text-accent transition-colors"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover:text-accent transition-colors"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="hover:text-accent transition-colors"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 

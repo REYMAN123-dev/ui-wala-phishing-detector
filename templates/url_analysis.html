@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Analysis - PhishGuard Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 75%, #533483 100%);
+        }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .risk-bar {
+            transition: width 1s ease-in-out;
+        }
+        .analysis-section {
+            border-left: 4px solid #00d4aa;
+            padding-left: 1rem;
+            margin: 1rem 0;
+        }
+        .indicator-item {
+            transition: all 0.3s ease;
+        }
+        .indicator-item:hover {
+            transform: translateX(5px);
+            color: #00d4aa;
+        }
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 46, 0.9);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .dark-card {
+            background: #1a1a2e;
+            border: 1px solid #2d2d44;
+            color: #e2e8f0;
+        }
+        .dark-input {
+            background: #16213e;
+            border: 1px solid #2d2d44;
+            color: #e2e8f0;
+        }
+        .dark-input:focus {
+            border-color: #00d4aa;
+            box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1);
+        }
+        .dark-input::placeholder {
+            color: #94a3b8;
+        }
+        .accent-button {
+            background: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+            color: white;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .accent-button:hover {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 212, 170, 0.3);
+        }
+        .secondary-button {
+            background: transparent;
+            color: #00d4aa;
+            border: 2px solid #00d4aa;
+            transition: all 0.3s ease;
+        }
+        .secondary-button:hover {
+            background: #00d4aa;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .nav-dark {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #2d2d44;
+        }
+        .text-accent {
+            color: #00d4aa;
+        }
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #16213e;
+            border-radius: 15px 15px 0 0;
+            border: 1px solid #2d2d44;
+        }
+        .chat-input-area {
+            padding: 20px;
+            background: #1a1a2e;
+            border-radius: 0 0 15px 15px;
+            border: 1px solid #2d2d44;
+            border-top: none;
+        }
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+        .message.user {
+            justify-content: flex-end;
+        }
+        .message-content {
+            max-width: 80%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            word-wrap: break-word;
+        }
+        .message.bot .message-content {
+            background: #2d2d44;
+            border: 1px solid #3d3d54;
+            color: #e2e8f0;
+        }
+        .message.user .message-content {
+            background: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+            color: white;
+        }
+        .typing .message-content {
+            background: #16213e !important;
+            border: 1px solid #2d2d44 !important;
+        }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+        }
+        .animate-bounce {
+            animation: bounce 1.4s infinite;
+        }
+        .result-card {
+            background: #2d2d44;
+            border: 1px solid #3d3d54;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <!-- Loading Overlay -->
+    <div id="loading" class="loading">
+        <div class="loading-spinner">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-400"></div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-dark shadow-lg fixed w-full z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <i class="fas fa-shield-alt text-2xl text-accent mr-3"></i>
+                    <span class="text-xl font-bold text-white">PhishGuard Pro</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="/" class="text-gray-300 hover:text-accent transition-colors">Home</a>
+                    <a href="/choose-analysis" class="text-gray-300 hover:text-accent transition-colors">Choose Analysis</a>
+                    <a href="/url-analysis" class="text-gray-300 hover:text-accent transition-colors">URL Analysis</a>
+                    <a href="/email-analysis" class="text-gray-300 hover:text-accent transition-colors">Email Analysis</a>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="/choose-analysis" class="secondary-button px-4 py-2 rounded-lg">
+                        <i class="fas fa-arrow-left mr-2"></i>Back
+                    </a>
+                    <a href="/" class="accent-button px-4 py-2 rounded-lg">
+                        <i class="fas fa-home mr-2"></i>Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white relative overflow-hidden pt-32 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-4xl mx-auto">
+                <h1 class="text-5xl font-bold mb-6 leading-tight">
+                    <span class="text-accent">URL Analysis</span>
+                    <br>Chat Interface
+                </h1>
+                <p class="text-xl mb-8 opacity-90 leading-relaxed">
+                    Enter suspicious URLs in the chat below and our AI will analyze them for phishing threats. 
+                    Get instant security insights and risk assessments.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chat Interface -->
+    <section class="py-16 bg-gray-800">
+        <div class="container mx-auto px-4">
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot">
+                        <div class="message-content">
+                            🔗 Welcome to URL Analysis! 
+                            <br><br>I'm here to help you analyze suspicious URLs for phishing threats. Simply paste any URL you want to check, and I'll provide a comprehensive security analysis.
+                            <br><br>💡 <strong>Tips:</strong>
+                            <br>• Include the full URL (http:// or https://)
+                            <br>• I'll analyze domain reputation, SSL certificates, and more
+                            <br>• Results include risk scores and detailed recommendations
+                            <br><br>What URL would you like me to analyze?
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <div class="flex space-x-3">
+                        <input type="text" id="urlInput" placeholder="Paste your URL here (e.g., https://example.com)" 
+                               class="dark-input flex-1 px-4 py-3 rounded-lg focus:outline-none"
+                               onkeypress="handleKeyPress(event)">
+                        <button onclick="analyzeURL()" class="accent-button px-6 py-3 rounded-lg">
+                            <i class="fas fa-search mr-2"></i>Analyze
+                        </button>
+                    </div>
+                    <div class="text-sm text-gray-400 mt-2">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Enter a complete URL including http:// or https:// for best results
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-white mb-4">What We Analyze</h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                    Comprehensive security analysis for every URL
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                <div class="dark-card rounded-xl p-6 card-hover text-center">
+                    <i class="fas fa-shield-alt text-3xl text-accent mb-4"></i>
+                    <h3 class="text-lg font-semibold mb-3 text-white">Domain Security</h3>
+                    <p class="text-gray-400 text-sm">
+                        SSL certificates, domain age, reputation, and typosquatting detection
+                    </p>
+                </div>
+                <div class="dark-card rounded-xl p-6 card-hover text-center">
+                    <i class="fas fa-link text-3xl text-accent mb-4"></i>
+                    <h3 class="text-lg font-semibold mb-3 text-white">Redirect Analysis</h3>
+                    <p class="text-gray-400 text-sm">
+                        Track redirect chains and identify suspicious forwarding patterns
+                    </p>
+                </div>
+                <div class="dark-card rounded-xl p-6 card-hover text-center">
+                    <i class="fas fa-chart-line text-3xl text-accent mb-4"></i>
+                    <h3 class="text-lg font-semibold mb-3 text-white">Risk Assessment</h3>
+                    <p class="text-gray-400 text-sm">
+                        AI-powered risk scoring with detailed threat indicators
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-950 text-white py-12">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex items-center justify-center mb-4">
+                <i class="fas fa-shield-alt text-2xl text-accent mr-3"></i>
+                <span class="text-xl font-bold">PhishGuard Pro</span>
+            </div>
+            <p class="text-gray-400 mb-4">
+                Advanced AI-powered phishing detection for a safer online experience
+            </p>
+            <div class="flex justify-center space-x-6 text-gray-400">
+                <a href="#" class="hover:text-accent transition-colors"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover:text-accent transition-colors"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="hover:text-accent transition-colors"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                analyzeURL();
+            }
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function addMessage(text, sender) {
+            const messages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            // Format the text with line breaks
+            const formattedText = text.replace(/\n/g, '<br>');
+            
+            messageDiv.innerHTML = `<div class="message-content">${formattedText}</div>`;
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function formatAnalysis(text) {
+            const sections = text.split('\n\n');
+            let formattedHtml = '';
+            
+            sections.forEach(section => {
+                if (section.trim()) {
+                    if (section.startsWith('Key Findings:')) {
+                        formattedHtml += '<div class="mb-4"><h5 class="font-semibold text-white mb-2">Key Findings:</h5>';
+                        const findings = section.replace('Key Findings:', '').split('-').filter(f => f.trim());
+                        formattedHtml += '<ul class="list-disc list-inside space-y-1">';
+                        findings.forEach(finding => {
+                            formattedHtml += `<li class="text-gray-400">${finding.trim()}</li>`;
+                        });
+                        formattedHtml += '</ul></div>';
+                    } else if (section.startsWith('Indicators:')) {
+                        formattedHtml += '<div class="mb-4"><h5 class="font-semibold text-white mb-2">Indicators:</h5>';
+                        const indicators = section.replace('Indicators:', '').split('-').filter(i => i.trim());
+                        formattedHtml += '<ul class="list-disc list-inside space-y-1">';
+                        indicators.forEach(indicator => {
+                            formattedHtml += `<li class="text-gray-400">${indicator.trim()}</li>`;
+                        });
+                        formattedHtml += '</ul></div>';
+                    } else if (section.startsWith('Recommendation:')) {
+                        formattedHtml += '<div class="mt-4 p-3 bg-gray-600 rounded-lg">';
+                        formattedHtml += `<h5 class="font-semibold text-accent mb-1">Recommendation:</h5>`;
+                        formattedHtml += `<p class="text-gray-300">${section.replace('Recommendation:', '').trim()}</p>`;
+                        formattedHtml += '</div>';
+                    }
+                }
+            });
+            
+            return formattedHtml;
+        }
+
+        async function analyzeURL() {
+            const urlInput = document.getElementById('urlInput');
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                addMessage('Please enter a URL to analyze.', 'bot');
+                urlInput.focus();
+                return;
+            }
+            
+            // Validate URL format
+            try {
+                new URL(url);
+            } catch (e) {
+                addMessage('Please enter a valid URL (including http:// or https://)', 'bot');
+                urlInput.focus();
+                return;
+            }
+            
+            // Add user message
+            addMessage(url, 'user');
+            urlInput.value = '';
+            
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot typing';
+            typingDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('chatMessages').appendChild(typingDiv);
+            
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/analyze/url', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+                
+                // Remove typing indicator
+                typingDiv.remove();
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to analyze URL');
+                }
+                
+                const data = await response.json();
+                
+                // Create result message
+                const resultHtml = `
+                    <div class="result-card">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-lg font-semibold text-white">Analysis Complete</h4>
+                            <span class="text-2xl font-bold ${data.risk_score > 70 ? 'text-red-400' : data.risk_score > 40 ? 'text-yellow-400' : 'text-green-400'}">${data.risk_score}/100</span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm text-gray-300">Risk Level</span>
+                                <span class="text-sm font-medium ${data.risk_score > 70 ? 'text-red-400' : data.risk_score > 40 ? 'text-yellow-400' : 'text-green-400'}">
+                                    ${data.risk_score > 70 ? 'High Risk' : data.risk_score > 40 ? 'Medium Risk' : 'Low Risk'}
+                                </span>
+                            </div>
+                            <div class="w-full bg-gray-600 rounded-full h-2">
+                                <div class="h-2 rounded-full ${data.risk_score > 70 ? 'bg-red-500' : data.risk_score > 40 ? 'bg-yellow-500' : 'bg-green-500'}" style="width: ${data.risk_score}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="analysis-section">
+                            <h5 class="font-semibold text-white mb-2">Detailed Analysis:</h5>
+                            <div class="text-gray-400 text-sm">${formatAnalysis(data.analysis)}</div>
+                        </div>
+                        
+                        <div class="analysis-section">
+                            <h5 class="font-semibold text-white mb-2">Key Indicators:</h5>
+                            <ul class="space-y-1">
+                                ${data.indicators.map(indicator => `
+                                    <li class="flex items-center text-gray-400 text-sm">
+                                        <i class="fas fa-exclamation-circle text-yellow-500 mr-2"></i>
+                                        ${indicator}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-4 pt-3 border-t border-gray-600">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-300">Confidence Level</span>
+                                <span class="text-sm font-medium text-accent">${(data.confidence * 100).toFixed(1)}%</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                addMessage(resultHtml, 'bot');
+                
+            } catch (error) {
+                // Remove typing indicator
+                typingDiv.remove();
+                
+                addMessage(`❌ Error analyzing URL: ${error.message}. Please try again with a different URL.`, 'bot');
+                console.error('URL analysis error:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+    </script>
+</body>
+</html> 
